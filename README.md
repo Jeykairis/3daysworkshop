@@ -2,6 +2,7 @@
 
 Requirements:
 
+- Docker
 - kubectl
   - Optionally: kubectx+kubens
 - Kubernetes cluster
@@ -10,14 +11,21 @@ Requirements:
   - Minikube
   - k3s
   - Managed kubernetes
+- k9s - https://k9scli.io/topics/install/
 
 ## Windows
 
-choco install -y kind kubernetes-helm
+Installs kind
+
+```
+choco install -y kind kubernetes-helm k9s
+```
 
 ## macOS
 
-brew install kind helm kubectx
+```
+brew install kind helm kubectx derailed/k9s/k9s
+```
 
 ## How to use this repository?
 

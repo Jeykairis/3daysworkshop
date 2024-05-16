@@ -1,0 +1,7 @@
+version: "3"
+
+services:
+  api:
+    image: workshop-api:latest
+    ports:
+      - 6565:8080

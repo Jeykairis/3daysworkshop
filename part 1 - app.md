@@ -152,7 +152,7 @@ Edit `src/api/Properties/launchSettings.json` and add new section at the end:
     }
 ```
 
-In the root of our project, create `docker-compose.dev.yml` with content:
+In the root of our project, create `Dockerfile.dev` with content:
 
 ```
 version: "3"
