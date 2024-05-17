@@ -3,6 +3,7 @@ using Hangfire;
 using Hangfire.PostgreSql;
 using Messages;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
 using Rebus.Bus;
 using Rebus.Config;
 using Rebus.Routing.TypeBased;
@@ -79,6 +80,9 @@ app.MapGet("/", () => Results.Redirect("/swagger/"));
 // }
 app.UseDeveloperExceptionPage();
 // app.UseHttpsRedirection();
+
+// app.UseHealthChecks("/health");
+app.UseMetricServer("/metrics");
 
 app.MapGet("/forecasts", (WeatherForecastContext context) =>
 {

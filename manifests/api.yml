@@ -29,6 +29,8 @@ spec:
           env:
             - name: CUSTOMCONNSTR_DefaultConnection
               value: "Host=db-postgresql.db.svc.cluster.local; Port=5432; Database=app_db; Username=app1; Password=AppPassword"
+            - name: CUSTOMCONNSTR_HangfireConnection
+              value: "Host=db-postgresql.db.svc.cluster.local; Port=5432; Database=app_db; Username=app1; Password=AppPassword"
       containers:
       - name: api
         image: docker.io/library/workshop-api:latest
@@ -45,11 +47,11 @@ spec:
         envFrom:
           - secretRef:
               name: db
-          # - name: CUSTOMCONNSTR_HangfireConnection
-          #   value: "Host=db-postgresql.db.svc.cluster.local; Port=5432; Database=app_db; Username=app1; Password=AppPassword"
         env:  
           - name: CUSTOMCONNSTR_RabbitMq
             value: "amqp://user:RabbitMqPassword@rabbitmq.default.svc.cluster.local"
+          - name: CUSTOMCONNSTR_HangfireConnection
+            value: "Host=db-postgresql.db.svc.cluster.local; Port=5432; Database=app_db; Username=app1; Password=AppPassword"
         resources:
           limits:
             cpu: "2"

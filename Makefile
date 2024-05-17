@@ -43,3 +43,6 @@ deploy-e2e:
 
 forward-rabbitmq:
 	kubectl port-forward svc/rabbitmq -n default 15673:15672
+
+forward-prometheus:
+	kubectl port-forward -n prometheus svc/prometheus-kube-prometheus-prometheus 9090:9090

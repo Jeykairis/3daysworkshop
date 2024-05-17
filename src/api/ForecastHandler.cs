@@ -11,6 +11,7 @@ internal sealed class ForecastHandler(
 {
     public async Task Handle(ForecastEvent message)
     {
+        PrometheusMetrics.ForecastProcessing.Inc();
         logger.LogInformation("Received forecast event: {Date} {TemperatureC} {Summary}", message.Date, message.TemperatureC, message.Summary);
 
         var date = message.Date.Date.ToUniversalTime();
@@ -37,6 +38,7 @@ internal sealed class ForecastHandler(
 
     public async Task Handle(ForecastEvent2 message)
     {
+        PrometheusMetrics.ForecastProcessing.Inc();
         logger.LogInformation("Received forecast event: {Date} {TemperatureC} {Summary} {Location}", message.Date, message.TemperatureC, message.Summary, message.Location);
 
         var date = message.Date.Date.ToUniversalTime();
