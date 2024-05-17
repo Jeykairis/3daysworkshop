@@ -9,7 +9,7 @@ build:
 run:
 	docker run --rm -it -p 6565:8080 workshop-api:latest
 
-push-kind:
+push:
 	kind load docker-image workshop-api:latest --name kind
 
 forward:

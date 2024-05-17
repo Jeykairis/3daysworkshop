@@ -37,6 +37,6 @@ deploy-app:
 
 deploy-e2e:
 	$(MAKE) -C src/api build
-	$(MAKE) -C src/api push-kind
+	$(MAKE) -C src/api push
 	$(MAKE) deploy-app
 	kubectl rollout restart deploy -n workshop-3days api

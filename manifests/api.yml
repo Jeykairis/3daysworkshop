@@ -18,17 +18,17 @@ spec:
       labels:
         app: api
     spec:
-      # initContainers:
-      #   - name: migrate
-      #     image: docker.io/library/workshop-api:latest
-      #     imagePullPolicy: IfNotPresent
-      #     command:
-      #       - dotnet
-      #       - api.dll
-      #       - "--migrate"
-      #     env:
-      #       - name: CUSTOMCONNSTR_DefaultConnection
-      #         value: "Host=db-postgresql.db.svc.cluster.local; Port=5432; Database=app_db; Username=app1; Password=AppPassword"
+      initContainers:
+        - name: migrate
+          image: docker.io/library/workshop-api:latest
+          imagePullPolicy: IfNotPresent
+          command:
+            - dotnet
+            - api.dll
+            - "--migrate"
+          env:
+            - name: CUSTOMCONNSTR_DefaultConnection
+              value: "Host=db-postgresql.db.svc.cluster.local; Port=5432; Database=app_db; Username=app1; Password=AppPassword"
       containers:
       - name: api
         image: docker.io/library/workshop-api:latest
@@ -42,9 +42,9 @@ spec:
         ports:
           - name: http
             containerPort: 8080
-        # env:
-          # - name: CUSTOMCONNSTR_DefaultConnection
-          #   value: "Host=db-postgresql.db.svc.cluster.local; Port=5432; Database=app_db; Username=app1; Password=AppPassword"
+        envFrom:
+          - secretRef:
+              name: db
           # - name: CUSTOMCONNSTR_HangfireConnection
           #   value: "Host=db-postgresql.db.svc.cluster.local; Port=5432; Database=app_db; Username=app1; Password=AppPassword"
           # - name: CUSTOMCONNSTR_RabbitMq

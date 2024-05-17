@@ -1,7 +1,23 @@
 version: "3"
 
 services:
-  api:
-    image: workshop-api:latest
+  # We will run app with dotnet watch run
+  # api:
+  #   image: workshop-api:latest
+  #   ports:
+  #     - 6565:8080
+
+  pg:
+    image: postgres:15.4-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
     ports:
-      - 6565:8080
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+
+volumes:
+  db:
+    driver: local

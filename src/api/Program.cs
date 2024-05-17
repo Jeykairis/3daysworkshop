@@ -1,3 +1,5 @@
+using api;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +16,13 @@ var logger = new LoggerConfiguration()
 // Register Serilog
 builder.Logging.AddSerilog(logger);
 
+builder.Services.AddDbContext<WeatherForecastContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+    logger.Information($"Adding DbContext: {connectionString}");
+    options.UseNpgsql(connectionString);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -21,34 +30,43 @@ var app = builder.Build();
 // {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.MapGet("/", () => Results.Redirect("/swagger/"));
 // }
-
+app.UseDeveloperExceptionPage();
 // app.UseHttpsRedirection();
 
-
-
-var summaries = new[]
+app.MapGet("/forecasts", (WeatherForecastContext context) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-app.MapGet("/", () => Results.Redirect("/swagger/"));
-app.MapGet("/weatherforecast", () =>
+    return context.Forecasts.ToList();
+});
+
+app.MapPost("/forecast", (
+    WeatherForecastEntity forecast,
+    WeatherForecastContext context) =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
+    context.Forecasts.Add(forecast);
+    context.SaveChanges();
     return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+});
 
-app.Run();
-
+if (args.Length > 0)
+{
+    switch (args[0])
+    {
+        case "--migrate":
+            {
+                app.Logger.LogInformation("Migrating database");
+                using var scope = app.Services.CreateScope();
+                using var context = scope.ServiceProvider.GetService<WeatherForecastContext>();
+                context?.Database.Migrate();
+                return;
+            }
+    }
+}
+else
+{
+    app.Run();
+}
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
