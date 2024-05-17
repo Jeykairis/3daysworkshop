@@ -47,8 +47,9 @@ spec:
               name: db
           # - name: CUSTOMCONNSTR_HangfireConnection
           #   value: "Host=db-postgresql.db.svc.cluster.local; Port=5432; Database=app_db; Username=app1; Password=AppPassword"
-          # - name: CUSTOMCONNSTR_RabbitMq
-          #   value: "amqp://user:RabbitMqPassword@rabbitmq.default.svc.cluster.local"
+        env:  
+          - name: CUSTOMCONNSTR_RabbitMq
+            value: "amqp://user:RabbitMqPassword@rabbitmq.default.svc.cluster.local"
         resources:
           limits:
             cpu: "2"

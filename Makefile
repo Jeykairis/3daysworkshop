@@ -40,3 +40,6 @@ deploy-e2e:
 	$(MAKE) -C src/api push
 	$(MAKE) deploy-app
 	kubectl rollout restart deploy -n workshop-3days api
+
+forward-rabbitmq:
+	kubectl port-forward svc/rabbitmq -n default 15673:15672
