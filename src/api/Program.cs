@@ -1,4 +1,6 @@
 using api;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Messages;
 using Microsoft.EntityFrameworkCore;
 using Rebus.Bus;
@@ -40,7 +42,33 @@ builder.Services
     })
     .AddRebusHandler<ForecastHandler>();
 
+builder.Services.AddScoped<IForecastProcessorService, ForecastProcessorService>();
+
+var hangfireConnectionString = builder.Configuration.GetConnectionString("HangfireConnection");
+var useHangfire = !string.IsNullOrEmpty(hangfireConnectionString);
+if (useHangfire)
+{
+    logger.Information("Adding Hangfire: " + hangfireConnectionString + ".");
+
+    builder.Services
+        .AddHangfire(configure =>
+        {
+            configure
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings()
+                .UsePostgreSqlStorage(b => b.UseNpgsqlConnection(hangfireConnectionString));
+        })
+        .AddHangfireServer();
+}
 var app = builder.Build();
+
+if (useHangfire)
+{
+    app.UseHangfireDashboard();
+}
+
+RecurringJob.AddOrUpdate("hello-world", () => Console.WriteLine("Hello World!"), Cron.Minutely);
 
 // Configure the HTTP request pipeline.
 // if (app.Environment.IsDevelopment())
@@ -80,6 +108,22 @@ app.MapPost("/forecast/publish-random", async (IBus bus) =>
         new Bogus.DataSets.Address().City()
     ));
     return "Published";
+});
+
+app.MapPost("/forecast/process", () =>
+{
+    app.Logger.LogInformation("Processing");
+    var jobId = Guid.NewGuid().ToString("N");
+    BackgroundJob.Schedule<IForecastProcessorService>(svc => svc.ProcessForecastsAsync(jobId), DateTime.Now.AddSeconds(1));
+    return $"Enqueued {jobId}";
+});
+
+app.MapPost("/forecast/process2", () =>
+{
+    app.Logger.LogInformation("Processing");
+    var jobId = Guid.NewGuid().ToString("N");
+    BackgroundJob.Schedule<IForecastProcessorService>(svc => svc.ProcessForecastsAsync2(jobId), DateTime.Now.AddSeconds(1));
+    return $"Enqueued {jobId}";
 });
 
 if (args.Length > 0)
